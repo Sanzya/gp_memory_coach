@@ -7,17 +7,12 @@ ESSAY = {
         "title": "Introduction",
         "text": """
 Main Thesis:
- Technology is deeply integrated into modern life and creates both benefits and risks. While society depends heavily on technology, humans are not completely at its mercy because people can regulate, adapt, and shape technological development.
-
-"text": """
-
+Technology is deeply integrated into modern life and creates both benefits and risks. While society depends heavily on technology, humans are not completely at its mercy because people can regulate, adapt, and shape technological development.
 INTRODUCTION:
-
 The Times feature was premised on Manjoo's realisation that the companies are impossible
 to live without in the modern day. Technology has become an undeniable force in our lives,
 transforming communication, commerce, entertainment and education. This pervasive influence
 begs the question: to what extent are we at the mercy of technology?
-
 """,
         "ideas": [
             "technology",
