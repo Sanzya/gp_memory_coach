@@ -1,13 +1,20 @@
-from flask import Flask, request
+import streamlit as st
 
-app = Flask(__name__)
+st.set_page_config(
+    page_title="GP Memory Coach",
+    page_icon="🎓",
+    layout="wide"
+)
 
 ESSAY = {
     1: {
         "title": "Introduction",
         "text": """
 Main Thesis:
-Technology is deeply integrated into modern life and creates both benefits and risks. While society depends heavily on technology, humans are not completely at its mercy because people can regulate, adapt, and shape technological development.
+Technology is deeply integrated into modern life and creates both benefits and risks.
+While society depends heavily on technology, humans are not completely at its mercy
+because people can regulate, adapt, and shape technological development.
+
 INTRODUCTION:
 The Times feature was premised on Manjoo's realisation that the companies are impossible
 to live without in the modern day. Technology has become an undeniable force in our lives,
@@ -137,214 +144,114 @@ TRANSFER_QUESTIONS = [
 ]
 
 
-@app.route("/", methods=["GET", "POST"])
-def home():
+st.title("🎓 GP 4-Day Memory Coach")
 
-    paragraph_no = int(request.values.get("paragraph", 1))
+paragraph_no = st.selectbox(
+    "Select Paragraph",
+    options=list(ESSAY.keys()),
+    format_func=lambda x: f"Paragraph {x} - {ESSAY[x]['title']}"
+)
 
-    if paragraph_no not in ESSAY:
-        paragraph_no = 1
+current = ESSAY[paragraph_no]
 
-    current = ESSAY[paragraph_no]
+st.subheader(f"Paragraph {paragraph_no}: {current['title']}")
 
-    report = ""
+st.info(current["text"])
 
-    if request.method == "POST":
+st.subheader("Day 2 - Recall")
 
-        answer = request.form.get("answer", "").lower()
+answer = st.text_area(
+    "Write the paragraph from memory here:",
+    height=300
+)
 
-        found = []
-        missing = []
+if st.button("Check My Answer"):
 
-        for idea in current["ideas"]:
+    answer_lower = answer.lower()
 
-            first_word = idea.split()[0].lower()
+    found = []
+    missing = []
 
-            if first_word in answer:
-                found.append(idea)
-            else:
-                missing.append(idea)
+    for idea in current["ideas"]:
+        first_word = idea.split()[0].lower()
 
-        coverage = int(
-            len(found) / len(current["ideas"]) * 100
-        )
-
-        # Content
-        if coverage >= 80:
-            content = 8
-        elif coverage >= 60:
-            content = 6
+        if first_word in answer_lower:
+            found.append(idea)
         else:
-            content = 4
+            missing.append(idea)
 
-        # Analysis
-        word_count = len(answer.split())
+    coverage = int(
+        len(found) / len(current["ideas"]) * 100
+    )
 
-        if word_count >= 60:
-            analysis = 8
-        elif word_count >= 30:
-            analysis = 6
-        else:
-            analysis = 4
+    if coverage >= 80:
+        content = 8
+    elif coverage >= 60:
+        content = 6
+    else:
+        content = 4
 
-        # Language
-        language = min(3 + len(found), 10)
+    word_count = len(answer.split())
 
-        total = content + analysis + language
+    if word_count >= 60:
+        analysis = 8
+    elif word_count >= 30:
+        analysis = 6
+    else:
+        analysis = 4
 
-        if total >= 22:
-            grade = "A"
-        elif total >= 18:
-            grade = "B"
-        elif total >= 14:
-            grade = "C"
-        else:
-            grade = "D"
+    language = min(3 + len(found), 10)
 
-        report = f"""
-        <div class='card'>
-            <h2>📊 A-Level GP Analysis</h2>
+    total = content + analysis + language
 
-            <p><b>Coverage:</b> {coverage}%</p>
-            <p><b>Content:</b> {content}/10</p>
-            <p><b>Analysis:</b> {analysis}/10</p>
-            <p><b>Language:</b> {language}/10</p>
+    if total >= 22:
+        grade = "A"
+    elif total >= 18:
+        grade = "B"
+    elif total >= 14:
+        grade = "C"
+    else:
+        grade = "D"
 
-            <h3>Estimated GP Grade: {grade}</h3>
+    st.markdown("---")
+    st.subheader("📊 A-Level GP Analysis")
 
-            <h3>✅ Ideas Remembered</h3>
-            <ul>
-                {''.join(f'<li>{x}</li>' for x in found)}
-            </ul>
+    col1, col2, col3, col4 = st.columns(4)
 
-            <h3>❌ Missing Ideas</h3>
-            <ul>
-                {''.join(f'<li>{x}</li>' for x in missing)}
-            </ul>
+    col1.metric("Coverage", f"{coverage}%")
+    col2.metric("Content", f"{content}/10")
+    col3.metric("Analysis", f"{analysis}/10")
+    col4.metric("Language", f"{language}/10")
 
-            <h3>💡 Improvements</h3>
-            <ul>
-                <li>Add examples.</li>
-                <li>Add evaluation.</li>
-                <li>Develop analysis.</li>
-                <li>Link back to the question.</li>
-            </ul>
-        </div>
-        """
+    st.success(f"Estimated GP Grade: {grade}")
 
-    options = ""
+    st.subheader("✅ Ideas Remembered")
 
-    for num in ESSAY:
+    if found:
+        for item in found:
+            st.write("•", item)
+    else:
+        st.write("None detected.")
 
-        selected = ""
+    st.subheader("❌ Missing Ideas")
 
-        if num == paragraph_no:
-            selected = "selected"
+    if missing:
+        for item in missing:
+            st.write("•", item)
+    else:
+        st.write("Excellent recall!")
 
-        options += f"""
-        <option value="{num}" {selected}>
-        Paragraph {num} - {ESSAY[num]['title']}
-        </option>
-        """
+    st.subheader("💡 Improvements")
 
-    transfer_html = ""
+    st.write("• Add specific examples.")
+    st.write("• Include evaluation and judgment.")
+    st.write("• Develop deeper analysis.")
+    st.write("• Link back to the question.")
+    st.write("• Use stronger topic sentences.")
 
-    for q in TRANSFER_QUESTIONS:
-        transfer_html += f"<li>{q}</li>"
+st.markdown("---")
 
-    return f"""
-<!DOCTYPE html>
-<html>
+st.subheader("Day 4 - Transfer Questions")
 
-<head>
-<title>GP Memory Coach</title>
-
-<style>
-
-body {{
-    font-family: Arial;
-    margin:40px;
-    background:#f5f6fa;
-}}
-
-.card {{
-    background:white;
-    padding:20px;
-    margin-bottom:20px;
-    border-radius:10px;
-    box-shadow:0 0 8px rgba(0,0,0,0.1);
-}}
-
-textarea {{
-    width:100%;
-    height:300px;
-}}
-
-button {{
-    background:#0078d7;
-    color:white;
-    border:none;
-    padding:10px 20px;
-    border-radius:5px;
-}}
-
-</style>
-</head>
-
-<body>
-
-<h1>🎓 GP 4-Day Memory Coach</h1>
-
-<div class="card">
-
-<form method="POST">
-
-<h2>Select Paragraph</h2>
-
-<select name="paragraph" onchange="this.form.submit()">
-
-{options}
-
-</select>
-
-<h2>
-Paragraph {paragraph_no}: {current['title']}
-</h2>
-
-<p>{current['text']}</p>
-
-<h3>Day 2 - Recall</h3>
-
-<textarea
-name="answer"
-placeholder="Write the paragraph from memory here..."
-></textarea>
-
-<br><br>
-
-<button type="submit">
-Check My Answer
-</button>
-
-</form>
-
-</div>
-
-{report}
-
-<div class="card">
-<h2>Day 4 - Transfer Questions</h2>
-
-<ul>
-{transfer_html}
-</ul>
-
-</div>
-
-</body>
-</html>
-"""
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+for question in TRANSFER_QUESTIONS:
+    st.write("•", question)
