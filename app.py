@@ -158,7 +158,7 @@ st.subheader(f"Paragraph {paragraph_no}: {current['title']}")
 
 st.info(current["text"])
 
-st.subheader("Day 2 - Recall")
+st.subheader("Recall")
 
 answer = st.text_area(
     "Write the paragraph from memory here:",
@@ -251,7 +251,7 @@ if st.button("Check My Answer"):
 
 st.markdown("---")
 
-st.subheader("Day 4 - Transfer Questions")
+st.subheader("Transfer Questions")
 
 for question in TRANSFER_QUESTIONS:
     st.write("•", question)
