@@ -6,6 +6,35 @@ st.set_page_config(
     layout="wide"
 )
 
+import streamlit as st
+
+st.set_page_config(
+    page_title="GP Memory Coach",
+    page_icon="🎓",
+    layout="wide"
+)
+
+# Hide Streamlit toolbar/header
+st.markdown("""
+<style>
+[data-testid="stHeader"] {
+    display: none;
+}
+
+[data-testid="stToolbar"] {
+    display: none;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+</style>
+""", unsafe_allow_html=True)
+
 ESSAY = {
     1: {
         "title": "Introduction",
